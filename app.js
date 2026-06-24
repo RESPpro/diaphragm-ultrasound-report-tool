@@ -203,7 +203,8 @@ const uiText = {
     practiceMeasurePoint: "测量点",
     practiceMethod: "测量方法",
     practiceLow: "低于阈值时",
-    practiceHigh: "高于阈值时"
+    practiceHigh: "高于阈值时",
+    printReport: "打印报告（PDF）"
   },
   en: {
     pageLanguage: "Page language",
@@ -262,11 +263,13 @@ const uiText = {
     practiceMeasurePoint: "Scan position",
     practiceMethod: "Method",
     practiceLow: "If below range",
-    practiceHigh: "If above range"
+    practiceHigh: "If above range",
+    printReport: "Print Report (PDF)"
   }
 };
 
 let currentLanguage = "zh";
+const patientValues = {};
 
 const standardPractice = {
   DD: {
@@ -504,6 +507,7 @@ const practiceTitle = document.querySelector("#practiceTitle");
 const practiceContent = document.querySelector("#practiceContent");
 const langZhButton = document.querySelector("#langZh");
 const langEnButton = document.querySelector("#langEn");
+const printReportButton = document.querySelector("#printReportButton");
 
 function t() {
   return uiText[currentLanguage];
@@ -547,6 +551,7 @@ function applyStaticText() {
   document.querySelector("#sourceTitle").textContent = t().sourceTitle;
   document.querySelector("#sourceParagraph1").textContent = t().sourceParagraph1;
   document.querySelector("#sourceParagraph2").textContent = t().sourceParagraph2;
+  printReportButton.textContent = t().printReport;
   langZhButton.classList.toggle("is-active", currentLanguage === "zh");
   langEnButton.classList.toggle("is-active", currentLanguage === "en");
 }
@@ -590,6 +595,15 @@ function formatRange(rangeText, unit) {
 }
 
 function getPatientValue(metricKey) {
+  if (Object.prototype.hasOwnProperty.call(patientValues, metricKey)) {
+    const storedValue = patientValues[metricKey];
+    if (storedValue === "") {
+      return null;
+    }
+
+    return Number(storedValue);
+  }
+
   const input = reportTableBody.querySelector(`[data-metric-input="${metricKey}"]`);
   if (!input || input.value.trim() === "") {
     return null;
@@ -656,6 +670,9 @@ function renderReport(ageGroup, sex) {
 
   const rows = metricDefinitions.map((metric) => {
     const result = classifyValue(metric, ranges[metric.key]);
+    const rawValue = Object.prototype.hasOwnProperty.call(patientValues, metric.key)
+      ? patientValues[metric.key]
+      : "";
 
     if (result.statusLabel === t().normal) {
       normalCount += 1;
@@ -671,7 +688,7 @@ function renderReport(ageGroup, sex) {
     return `
       <tr>
         <td class="metric-name-cell" data-label="${t().dataLabelMetric}"><button class="metric-trigger" type="button" data-metric="${metric.key}">${getMetricShortLabel(metric)}</button><br>${getMetricLabel(metric)}</td>
-        <td data-label="${t().dataLabelPatientValue}"><input class="value-input" type="number" step="0.01" data-metric-input="${metric.key}" value="${result.patientValue === t().notEntered ? "" : result.patientValue}" placeholder="${t().inputPlaceholder}"></td>
+        <td data-label="${t().dataLabelPatientValue}"><input class="value-input" type="number" step="0.01" data-metric-input="${metric.key}" value="${rawValue}" placeholder="${t().inputPlaceholder}"></td>
         <td data-label="${t().dataLabelRange}">${formatRange(ranges[metric.key], metric.unit)}</td>
         <td data-label="${t().dataLabelUnit}">${metric.unit}</td>
         <td data-label="${t().dataLabelResult}"><span class="badge ${result.statusClass}">${result.statusLabel}</span></td>
@@ -758,11 +775,54 @@ function renderRanges() {
   renderReport(ageGroup, sex);
 }
 
+function syncPatientValuesFromDom() {
+  reportTableBody.querySelectorAll("[data-metric-input]").forEach((input) => {
+    patientValues[input.dataset.metricInput] = input.value;
+  });
+}
+
+function commitPatientValues() {
+  syncPatientValuesFromDom();
+
+  const { ageGroup, sex } = getSelection();
+  renderReport(ageGroup, sex);
+}
+
 ageInput.addEventListener("input", renderRanges);
 sexSelect.addEventListener("change", renderRanges);
 reportTableBody.addEventListener("input", () => {
-  const { ageGroup, sex } = getSelection();
-  renderReport(ageGroup, sex);
+  syncPatientValuesFromDom();
+});
+
+reportTableBody.addEventListener("change", (event) => {
+  if (!event.target.closest("[data-metric-input]")) {
+    return;
+  }
+
+  commitPatientValues();
+});
+
+reportTableBody.addEventListener("focusout", (event) => {
+  if (!event.target.closest("[data-metric-input]")) {
+    return;
+  }
+
+  commitPatientValues();
+});
+
+reportTableBody.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter") {
+    return;
+  }
+
+  const input = event.target.closest("[data-metric-input]");
+  if (!input) {
+    return;
+  }
+
+  event.preventDefault();
+  commitPatientValues();
+  input.blur();
 });
 
 reportTableBody.addEventListener("click", (event) => {
@@ -772,6 +832,10 @@ reportTableBody.addEventListener("click", (event) => {
   }
 
   renderPractice(trigger.dataset.metric);
+});
+
+printReportButton.addEventListener("click", () => {
+  window.print();
 });
 
 langZhButton.addEventListener("click", () => {
