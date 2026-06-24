@@ -14,11 +14,11 @@
     <section class="hero">
       <p class="eyebrow">Diaphragm Ultrasound Reference Tool</p>
       <h1>膈肌超声标准参考小工具</h1>
-      <p class="intro">输入患者年龄与性别，查看对应膈肌超声指标的正常参考范围。点击任一指标标题，可查看标准测量方法与超声提示意义。</p>
+      <p class="intro">输入患者年龄、性别与各项膈肌超声测量值，页面会像化验单一样同时给出正常参考范围、单项结果判断，以及患者膈肌功能的整体摘要。点击任一指标标题，可查看标准测量方法与超声提示意义。</p>
     </section>
 
     <section class="panel controls-panel">
-      <div class="field-grid">
+      <div class="field-grid demographics-grid">
         <label class="field">
           <span>年龄</span>
           <input id="age" type="number" min="18" max="99" value="45" aria-label="年龄" placeholder="请输入 18-99 岁">
@@ -34,6 +34,45 @@
       </div>
 
       <div class="selection-summary" id="selectionSummary"></div>
+
+      <div class="measurements-section">
+        <div class="section-head compact-head">
+          <div>
+            <p class="section-kicker">Patient Inputs</p>
+            <h2>患者测量值录入</h2>
+          </div>
+          <p class="section-note">可只填写已完成测量的项目，结果会自动更新</p>
+        </div>
+        <div id="measurementInputs" class="measurement-grid"></div>
+      </div>
+    </section>
+
+    <section class="panel report-panel">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">Patient Report</p>
+          <h2>患者结果报告</h2>
+        </div>
+        <p class="section-note">基于当前年龄组和性别参考范围自动判读</p>
+      </div>
+
+      <div id="reportSummary" class="report-summary"></div>
+
+      <div class="report-table-wrap">
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th>指标</th>
+              <th>患者值</th>
+              <th>正常范围</th>
+              <th>单位</th>
+              <th>结果</th>
+              <th>提示</th>
+            </tr>
+          </thead>
+          <tbody id="reportTableBody"></tbody>
+        </table>
+      </div>
     </section>
 
     <section class="content-grid">

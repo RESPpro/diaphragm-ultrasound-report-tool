@@ -228,7 +228,10 @@ const standardPractice = {
 
 const ageInput = document.querySelector("#age");
 const sexSelect = document.querySelector("#sex");
+const measurementInputs = document.querySelector("#measurementInputs");
 const metricGrid = document.querySelector("#metricGrid");
+const reportSummary = document.querySelector("#reportSummary");
+const reportTableBody = document.querySelector("#reportTableBody");
 const selectionSummary = document.querySelector("#selectionSummary");
 const practiceTitle = document.querySelector("#practiceTitle");
 const practiceContent = document.querySelector("#practiceContent");
@@ -260,6 +263,146 @@ function getSelection() {
     ageGroup: resolveAgeGroup(age),
     sex: sexSelect.value
   };
+}
+
+function parseRange(rangeText) {
+  const [lower, upper] = rangeText.split("-").map(Number);
+  return { lower, upper };
+}
+
+function formatRange(rangeText, unit) {
+  return `${rangeText} ${unit}`;
+}
+
+function renderMeasurementInputs() {
+  measurementInputs.innerHTML = metricDefinitions.map((metric) => `
+    <article class="measurement-card">
+      <label>
+        <strong>${metric.title}</strong>
+        <span>${metric.label} (${metric.unit})</span>
+        <input type="number" step="0.01" data-metric-input="${metric.key}" placeholder="请输入 ${metric.title}">
+      </label>
+    </article>
+  `).join("");
+}
+
+function getPatientValue(metricKey) {
+  const input = measurementInputs.querySelector(`[data-metric-input="${metricKey}"]`);
+  if (!input || input.value.trim() === "") {
+    return null;
+  }
+
+  return Number(input.value);
+}
+
+function classifyValue(metric, rangeText) {
+  const patientValue = getPatientValue(metric.key);
+  if (patientValue === null || Number.isNaN(patientValue)) {
+    return {
+      patientValue: "未录入",
+      statusLabel: "待录入",
+      statusClass: "badge-empty",
+      note: "未提供该指标测量值。"
+    };
+  }
+
+  const { lower, upper } = parseRange(rangeText);
+  if (patientValue < lower) {
+    return {
+      patientValue: patientValue.toFixed(2),
+      statusLabel: "偏低",
+      statusClass: "badge-low",
+      note: standardPractice[metric.key].lowMeaning
+    };
+  }
+
+  if (patientValue > upper) {
+    return {
+      patientValue: patientValue.toFixed(2),
+      statusLabel: "偏高",
+      statusClass: "badge-high",
+      note: standardPractice[metric.key].highMeaning
+    };
+  }
+
+  return {
+    patientValue: patientValue.toFixed(2),
+    statusLabel: "正常",
+    statusClass: "badge-normal",
+    note: "位于当前年龄组和性别对应的正常参考范围内。"
+  };
+}
+
+function renderReport(ageGroup, sex) {
+  if (!ageGroup) {
+    reportSummary.innerHTML = `
+      <article class="summary-card">
+        <h3>报告状态</h3>
+        <p>请输入 18-99 岁之间的年龄后再生成患者报告。</p>
+      </article>
+    `;
+    reportTableBody.innerHTML = "";
+    return;
+  }
+
+  const ranges = rangesByGroup[ageGroup][sex];
+  let normalCount = 0;
+  let lowCount = 0;
+  let highCount = 0;
+  let enteredCount = 0;
+
+  const rows = metricDefinitions.map((metric) => {
+    const result = classifyValue(metric, ranges[metric.key]);
+
+    if (result.statusLabel === "正常") {
+      normalCount += 1;
+      enteredCount += 1;
+    } else if (result.statusLabel === "偏低") {
+      lowCount += 1;
+      enteredCount += 1;
+    } else if (result.statusLabel === "偏高") {
+      highCount += 1;
+      enteredCount += 1;
+    }
+
+    return `
+      <tr>
+        <td class="metric-name-cell"><strong>${metric.title}</strong><br>${metric.label}</td>
+        <td>${result.patientValue}</td>
+        <td>${formatRange(ranges[metric.key], metric.unit)}</td>
+        <td>${metric.unit}</td>
+        <td><span class="badge ${result.statusClass}">${result.statusLabel}</span></td>
+        <td>${result.note}</td>
+      </tr>
+    `;
+  }).join("");
+
+  const overallText = enteredCount === 0
+    ? "尚未录入任何患者测量值。"
+    : lowCount === 0 && highCount === 0
+      ? "已录入项目均位于正常范围内。"
+      : `已录入项目中有 ${lowCount} 项偏低，${highCount} 项偏高，建议结合临床情况综合判断。`;
+
+  reportSummary.innerHTML = `
+    <article class="summary-card">
+      <h3>已录入项目</h3>
+      <p><span class="summary-value">${enteredCount}</span>共 ${metricDefinitions.length} 项</p>
+    </article>
+    <article class="summary-card">
+      <h3>正常项目</h3>
+      <p><span class="summary-value">${normalCount}</span>处于参考范围内</p>
+    </article>
+    <article class="summary-card">
+      <h3>异常项目</h3>
+      <p><span class="summary-value">${lowCount + highCount}</span>偏低 ${lowCount} 项，偏高 ${highCount} 项</p>
+    </article>
+    <article class="summary-card">
+      <h3>整体摘要</h3>
+      <p>${overallText}</p>
+    </article>
+  `;
+
+  reportTableBody.innerHTML = rows;
 }
 
 function renderSummary(age, ageGroup, sex) {
@@ -306,6 +449,7 @@ function renderRanges() {
     metricGrid.innerHTML = "";
     practiceTitle.textContent = "年龄超出范围";
     practiceContent.innerHTML = '<p class="placeholder">请输入 18-99 岁之间的年龄后再查看参考范围与标准做法。</p>';
+    renderReport(ageGroup, sex);
     return;
   }
 
@@ -319,10 +463,16 @@ function renderRanges() {
       <p class="metric-unit">单位: ${metric.unit}</p>
     </article>
   `).join("");
+
+  renderReport(ageGroup, sex);
 }
 
 ageInput.addEventListener("input", renderRanges);
 sexSelect.addEventListener("change", renderRanges);
+measurementInputs.addEventListener("input", () => {
+  const { ageGroup, sex } = getSelection();
+  renderReport(ageGroup, sex);
+});
 
 metricGrid.addEventListener("click", (event) => {
   const trigger = event.target.closest(".metric-title");
@@ -333,5 +483,6 @@ metricGrid.addEventListener("click", (event) => {
   renderPractice(trigger.dataset.metric);
 });
 
+renderMeasurementInputs();
 renderRanges();
 renderPractice("DD");
