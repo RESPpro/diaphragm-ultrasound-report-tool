@@ -18,7 +18,3 @@ Static clinician-facing tool for looking up normal diaphragm ultrasound referenc
 ## Planned extension
 
 The data model can be extended later to support literature-derived normal ranges for additional populations or race-specific cohorts, as long as the source evidence is clearly versioned and labeled.
-
-## Suggested repository name
-
-`diaphragm-ultrasound-reference-tool`
