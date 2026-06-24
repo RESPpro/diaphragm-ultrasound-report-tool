@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>膈肌超声参考范围查询</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="hero">
+      <p class="eyebrow">Diaphragm Ultrasound Reference Tool</p>
+      <h1>膈肌超声标准参考小工具</h1>
+      <p class="intro">输入患者年龄与性别，查看对应膈肌超声指标的正常参考范围。点击任一指标标题，可查看标准测量方法与超声提示意义。</p>
+    </section>
+
+    <section class="panel controls-panel">
+      <div class="field-grid">
+        <label class="field">
+          <span>年龄</span>
+          <input id="age" type="number" min="18" max="99" value="45" aria-label="年龄" placeholder="请输入 18-99 岁">
+        </label>
+
+        <label class="field">
+          <span>性别</span>
+          <select id="sex" aria-label="性别">
+            <option value="male">男性</option>
+            <option value="female">女性</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="selection-summary" id="selectionSummary"></div>
+    </section>
+
+    <section class="content-grid">
+      <section class="panel ranges-panel">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">Reference Ranges</p>
+            <h2>正常范围</h2>
+          </div>
+          <p class="section-note">点击指标标题查看标准做法</p>
+        </div>
+        <div id="metricGrid" class="metric-grid" aria-live="polite"></div>
+      </section>
+
+      <aside class="panel practice-panel">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">Standard Practice</p>
+            <h2 id="practiceTitle">选择一个指标</h2>
+          </div>
+        </div>
+        <div id="practiceContent" class="practice-content">
+          <p class="placeholder">点击左侧任一指标卡片标题，查看测量点、测量方法及低于/高于阈值时的超声提示意义。</p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="panel source-panel">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">Source Basis</p>
+          <h2>数据来源说明</h2>
+        </div>
+      </div>
+      <p>参考范围与标准测量说明依据用户提供的文献截图录入。范围数据覆盖 18-99 岁成人，按年龄组与性别区分。</p>
+      <p>缩写说明：DD 为膈肌移动度，DD-di 为深吸气膈肌移动度，DPSV 为膈肌收缩期峰值速度，DPDV 为膈肌舒张期峰值速度，PSD 为膈肌滑动位移，DT-ee 为呼气末膈肌厚度，DT-ei 为吸气末膈肌厚度，DT-edi 为吸呼气厚度差，DTF 为膈肌增厚率，DTF-di 为深吸气膈肌增厚率，DT 为分组统计。 </p>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
