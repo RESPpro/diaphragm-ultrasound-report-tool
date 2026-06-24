@@ -32,6 +32,52 @@ body {
   padding: 40px 0 48px;
 }
 
+.topbar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 32px 8px;
+}
+
+.language-switcher {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255, 253, 250, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 10px 24px rgba(35, 45, 54, 0.08);
+}
+
+.language-switcher span {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.language-buttons {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.lang-button {
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.lang-button.is-active {
+  border-color: rgba(15, 108, 116, 0.25);
+  background: rgba(15, 108, 116, 0.12);
+  color: var(--accent-strong);
+  font-weight: 700;
+}
+
 .hero {
   padding: 28px 32px 16px;
 }
@@ -129,50 +175,8 @@ body {
   margin-top: 22px;
 }
 
-.report-inputs {
-  margin-bottom: 22px;
-}
-
 .compact-head {
   margin-bottom: 16px;
-}
-
-.measurement-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.measurement-card {
-  padding: 16px;
-  border-radius: 20px;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.72);
-}
-
-.measurement-card label {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.measurement-card strong {
-  font-size: 0.98rem;
-}
-
-.measurement-card span {
-  color: var(--muted);
-  font-size: 0.88rem;
-}
-
-.measurement-card input {
-  width: 100%;
-  padding: 12px 14px;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.95);
-  color: var(--ink);
-  font: inherit;
 }
 
 .report-panel,
@@ -247,6 +251,34 @@ body {
 
 .metric-name-cell {
   min-width: 130px;
+}
+
+.metric-trigger {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent-strong);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+}
+
+.value-input {
+  width: 120px;
+  max-width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--ink);
+  font: inherit;
+}
+
+.value-input:focus,
+.metric-trigger:focus {
+  outline: 2px solid rgba(15, 108, 116, 0.35);
+  outline-offset: 2px;
 }
 
 .badge {
@@ -408,9 +440,62 @@ body {
     padding-top: 24px;
   }
 
-  .measurement-grid,
   .report-summary {
     grid-template-columns: 1fr;
+  }
+
+  .section-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .report-table,
+  .report-table thead,
+  .report-table tbody,
+  .report-table tr,
+  .report-table th,
+  .report-table td {
+    display: block;
+  }
+
+  .report-table {
+    min-width: 0;
+  }
+
+  .report-table thead {
+    display: none;
+  }
+
+  .report-table tr {
+    margin-bottom: 16px;
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.78);
+  }
+
+  .report-table td {
+    padding: 6px 0;
+    border-bottom: 0;
+  }
+
+  .report-table td::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 4px;
+    color: var(--muted);
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .metric-name-cell::before {
+    content: "指标";
+  }
+
+  .value-input {
+    width: 100%;
   }
 
   .hero,
@@ -418,6 +503,25 @@ body {
   .practice-panel,
   .source-panel {
     padding: 20px;
+  }
+
+  .topbar {
+    justify-content: stretch;
+    padding: 0 0 8px;
+  }
+
+  .language-switcher {
+    width: 100%;
+    justify-content: space-between;
+    border-radius: 20px;
+  }
+
+  .language-buttons {
+    width: 100%;
+  }
+
+  .lang-button {
+    flex: 1;
   }
 
   .field-grid,
