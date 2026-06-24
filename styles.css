@@ -74,7 +74,6 @@ body {
   backdrop-filter: blur(10px);
 }
 
-.controls-panel,
 .source-panel {
   padding: 24px 28px;
 }
@@ -130,6 +129,10 @@ body {
   margin-top: 22px;
 }
 
+.report-inputs {
+  margin-bottom: 22px;
+}
+
 .compact-head {
   margin-bottom: 16px;
 }
@@ -173,7 +176,6 @@ body {
 }
 
 .report-panel,
-.ranges-panel,
 .practice-panel {
   padding: 24px;
 }
@@ -280,7 +282,7 @@ body {
 
 .content-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.95fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 22px;
   margin-top: 22px;
 }
@@ -412,9 +414,7 @@ body {
   }
 
   .hero,
-  .controls-panel,
   .report-panel,
-  .ranges-panel,
   .practice-panel,
   .source-panel {
     padding: 20px;
