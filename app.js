@@ -518,7 +518,7 @@ function getMetricShortLabel(metric) {
 }
 
 function getPractice(metricKey) {
-  return currentLanguage === "zh" ? standardPractice[metricKey] : standardPracticeEn[metricKey];
+  return standardPractice[metricKey];
 }
 
 function applyStaticText() {
@@ -677,6 +677,7 @@ function renderReport(ageGroup, sex) {
         <td data-label="${t().dataLabelResult}"><span class="badge ${result.statusClass}">${result.statusLabel}</span></td>
         <td data-label="${t().dataLabelNote}">${result.note}</td>
       </tr>
+    `;
   }).join("");
 
   const overallText = enteredCount === 0
